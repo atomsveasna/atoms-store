@@ -1,56 +1,124 @@
 /**
  * lib/data/products.ts
- *
- * ALL product data access goes through this file.
- * Pages and components never import from lib/products.ts directly.
- *
- * Phase 0: reads from static seed data (lib/seed/products.ts)
- * Phase 1: swap the internals here to read from Prisma/Supabase
- *           — zero changes needed in any page or component.
- *
- * Rule: every function returns Product | Product[] | null.
- *       Never throws. Returns null when not found.
+ * Phase 0: seed data | Phase 1: Supabase (current)
+ * Falls back to seed data if Supabase is not configured.
  */
 
 import type { Product, ProductCategory } from '@/types'
-import { PRODUCTS } from '@/lib/seed/products'
 
-// ── Read all ──────────────────────────────────────────────────
+const USE_SUPABASE = !!(
+  process.env.NEXT_PUBLIC_SUPABASE_URL &&
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
 
-export async function getAllProducts(): Promise<Product[]> {
-  // Phase 1: return prisma.product.findMany()
+function mapRow(row: Record<string, unknown>): Product {
+  return {
+    id:                 row.id as string,
+    slug:               row.slug as string,
+    name:               row.name as string,
+    tagline:            row.tagline as string,
+    description:        row.description as string,
+    longDescription:    row.long_description as string | undefined,
+    category:           row.category as ProductCategory,
+    status:             row.status as Product['status'],
+    price:              Number(row.price),
+    currency:           row.currency as string,
+    sku:                row.sku as string,
+    features:           row.features as string[],
+    specs:              row.specs as Product['specs'],
+    packageContents:    row.package_contents as string[],
+    downloads:          row.downloads as Product['downloads'],
+    faqs:               row.faqs as Product['faqs'],
+    relatedSlugs:       row.related_slugs as string[],
+    worksWithPlatforms: row.works_with_platforms as string[],
+    docSlug:            row.doc_slug as string | undefined,
+    firmwareVersion:    row.firmware_version as string | undefined,
+    revisionHistory:    row.revision_history as Product['revisionHistory'],
+    isNew:              row.is_new as boolean,
+    isFeatured:         row.is_featured as boolean,
+    images:             (row.images as Product['images']) ?? [],
+    createdAt:          row.created_at as string,
+    updatedAt:          row.updated_at as string,
+  }
+}
+
+async function supabaseFetch(path: string) {
+  const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/${path}`
+  const res = await fetch(url, {
+    headers: {
+      apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`,
+    },
+    next: { revalidate: 60 },
+  })
+  if (!res.ok) throw new Error(`Supabase error: ${res.status}`)
+  return res.json()
+}
+
+async function getSeedProducts(): Promise<Product[]> {
+  const { PRODUCTS } = await import('@/lib/seed/products')
   return PRODUCTS
 }
 
-// ── Read one ──────────────────────────────────────────────────
-
-export async function getProductBySlug(slug: string): Promise<Product | null> {
-  // Phase 1: return prisma.product.findUnique({ where: { slug } })
-  return PRODUCTS.find((p) => p.slug === slug) ?? null
+export async function getAllProducts(): Promise<Product[]> {
+  if (!USE_SUPABASE) return getSeedProducts()
+  try {
+    const rows = await supabaseFetch('products?select=*&order=created_at.desc')
+    return rows.map(mapRow)
+  } catch { return getSeedProducts() }
 }
 
-// ── Filtered reads ────────────────────────────────────────────
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+  if (!USE_SUPABASE) {
+    const p = await getSeedProducts()
+    return p.find((p) => p.slug === slug) ?? null
+  }
+  try {
+    const rows = await supabaseFetch(`products?select=*&slug=eq.${slug}&limit=1`)
+    return rows.length > 0 ? mapRow(rows[0]) : null
+  } catch {
+    const p = await getSeedProducts()
+    return p.find((p) => p.slug === slug) ?? null
+  }
+}
 
 export async function getFeaturedProducts(): Promise<Product[]> {
-  // Phase 1: return prisma.product.findMany({ where: { isFeatured: true } })
-  return PRODUCTS.filter((p) => p.isFeatured)
+  if (!USE_SUPABASE) {
+    const p = await getSeedProducts()
+    return p.filter((p) => p.isFeatured)
+  }
+  try {
+    const rows = await supabaseFetch('products?select=*&is_featured=eq.true')
+    return rows.map(mapRow)
+  } catch {
+    const p = await getSeedProducts()
+    return p.filter((p) => p.isFeatured)
+  }
 }
 
 export async function getProductsByCategory(category: ProductCategory): Promise<Product[]> {
-  // Phase 1: return prisma.product.findMany({ where: { category } })
-  return PRODUCTS.filter((p) => p.category === category)
+  if (!USE_SUPABASE) {
+    const p = await getSeedProducts()
+    return p.filter((p) => p.category === category)
+  }
+  try {
+    const rows = await supabaseFetch(`products?select=*&category=eq.${category}`)
+    return rows.map(mapRow)
+  } catch {
+    const p = await getSeedProducts()
+    return p.filter((p) => p.category === category)
+  }
 }
 
 export async function getRelatedProducts(product: Product): Promise<Product[]> {
-  // Phase 1: query by relatedSlugs or same category
+  const all = await getAllProducts()
   if (product.relatedSlugs.length > 0) {
-    return PRODUCTS.filter((p) => product.relatedSlugs.includes(p.slug))
+    return all.filter((p) => product.relatedSlugs.includes(p.slug))
   }
-  return PRODUCTS.filter((p) => p.category === product.category && p.slug !== product.slug).slice(0, 3)
+  return all.filter((p) => p.category === product.category && p.slug !== product.slug).slice(0, 3)
 }
 
-// ── Static params (for generateStaticParams) ──────────────────
-
 export function getAllProductSlugs(): { slug: string }[] {
-  return PRODUCTS.map((p) => ({ slug: p.slug }))
+  const { PRODUCTS } = require('@/lib/seed/products')
+  return PRODUCTS.map((p: Product) => ({ slug: p.slug }))
 }
