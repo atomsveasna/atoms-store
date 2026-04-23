@@ -1,3 +1,5 @@
+import type { Product } from "@/types"
+
 /** lib/seed/products.ts — static seed data for Phase 0. Always access via lib/data/products.ts */
 
 // ── Atoms Smart Switch 1G — Seed / Placeholder Data ──────────
