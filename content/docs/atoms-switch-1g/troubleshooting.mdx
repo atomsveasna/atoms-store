@@ -1,0 +1,51 @@
+---
+title: "Troubleshooting"
+description: "Common issues and how to resolve them."
+category: troubleshooting
+productSlug: atoms-switch-1g
+order: 6
+lastUpdated: "2025-03-01"
+tags: [troubleshooting, issues, reset]
+---
+
+# Troubleshooting
+
+## Device Won't Connect to Wi-Fi
+
+**Symptoms:** LED keeps pulsing blue after provisioning.
+
+1. Confirm you entered the correct Wi-Fi password.
+2. Check your router — the 2.4GHz band must be enabled (5GHz is not supported).
+3. Move the switch closer to the router temporarily to rule out signal issues.
+4. Perform a factory reset (see below) and re-provision.
+
+## LED is Red After Powering On
+
+A solid red LED indicates an overload or overcurrent condition. Check:
+
+- The connected load does not exceed 10A / 2200W.
+- No short circuit on the load side.
+
+Disconnect the load and cycle power. If the red LED persists, contact support.
+
+## Physical Button Not Responding
+
+- Check wiring — the live input (L) must be connected correctly.
+- If the switch is in a locked state via the API, send `POST /api/lock` with `locked: false`.
+
+## Cannot Reach Device Web UI
+
+1. Check the device IP in your router's DHCP client list.
+2. Try mDNS: `http://atoms-XXXXXX.local`
+3. If mDNS is not working, use a network scanner (e.g. Fing) to find the IP.
+
+## Factory Reset
+
+Press and hold the physical button for **10 seconds** until the LED flashes red/blue
+alternately. Release. The device will reset and re-enter provisioning mode.
+
+> ⚠️ Factory reset clears all Wi-Fi credentials and custom settings.
+
+## Still Not Resolved?
+
+[Contact Support](/support) — include your order number and firmware version.

@@ -1,0 +1,58 @@
+---
+title: "Quick Start Guide"
+description: "Provision your Atoms Smart Switch 1G to Wi-Fi in under 2 minutes."
+category: getting-started
+productSlug: atoms-switch-1g
+order: 2
+lastUpdated: "2025-03-01"
+tags: [quick-start, provisioning, setup]
+---
+
+# Quick Start Guide
+
+## Step 1 — Power On
+
+Wire the switch into your wall box and restore power. The LED will pulse blue,
+indicating it is in provisioning mode.
+
+> ⚠️ **Safety first.** Always isolate the circuit at the breaker before wiring.
+> See the full [Installation Guide](/docs/atoms-switch-1g/installation) for wiring diagrams.
+
+## Step 2 — Connect to the Setup Hotspot
+
+On your phone or laptop, connect to the Wi-Fi network:
+
+```
+Network: Atoms-Setup-XXXXXX
+Password: atoms1234
+```
+
+## Step 3 — Open the Provisioning Page
+
+Open your browser and go to:
+
+```
+http://192.168.4.1
+```
+
+The Atoms provisioning page will load. Enter your home Wi-Fi credentials and tap **Save**.
+
+## Step 4 — Connect to Your Network
+
+The device will reboot and join your Wi-Fi. The LED turns solid green when connected.
+
+Find the device IP by checking your router's DHCP table, or use mDNS:
+
+```
+http://atoms-XXXXXX.local
+```
+
+## Step 5 — Test
+
+Open the device web UI. Toggle the switch on and off. Done.
+
+## What's Next
+
+- [Home Assistant Integration](/docs/atoms-switch-1g/home-assistant)
+- [REST API Reference](/docs/atoms-switch-1g/api)
+- [Firmware Update](/docs/atoms-switch-1g/firmware)
