@@ -3,15 +3,27 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { getStatusLabel } from '@/lib/utils'
+import { useCart } from '@/lib/cart'
 import type { Product } from '@/types'
 
 export default function AddToCart({ product }: { product: Product }) {
+  const { addItem } = useCart()
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
 
   const canBuy = product.status === 'in_stock' || product.status === 'low_stock'
 
   function handleAdd() {
+    for (let i = 0; i < qty; i++) {
+      addItem({
+        productId: product.id,
+        slug: product.slug,
+        name: product.name,
+        sku: product.sku,
+        price: product.price,
+        image: product.images[0]?.src,
+      })
+    }
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
   }
