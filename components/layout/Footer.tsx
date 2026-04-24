@@ -35,7 +35,7 @@ const LINKS = {
 
 export default function Footer() {
   return (
-    <footer className="border-t border-white/[0.06] bg-[#060b17] text-white/60">
+    <footer style={{ backgroundColor: 'var(--bg-secondary)', borderTop: '1px solid var(--border)', color: 'var(--text-secondary)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
 
         {/* Newsletter */}
