@@ -6,9 +6,11 @@ import { formatPrice, getStatusLabel } from '@/lib/utils'
 import ProductGallery from '@/components/product/ProductGallery'
 import AddToCart from '@/components/product/AddToCart'
 import { TabOverview, TabSpecs, TabSetup, TabDownloads, TabFAQ } from '@/components/product/ProductTabs'
+import ProductReviews from '@/components/product/ProductReviews'
 import type { Product } from '@/types'
+import type { Review, ReviewStats } from '@/lib/data/reviews'
 
-type Tab = 'overview' | 'specs' | 'setup' | 'downloads' | 'faq'
+type Tab = 'overview' | 'specs' | 'setup' | 'downloads' | 'faq' | 'reviews'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'overview',  label: 'Overview' },
@@ -16,9 +18,16 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'setup',     label: 'Setup & Docs' },
   { id: 'downloads', label: 'Downloads' },
   { id: 'faq',       label: 'FAQ' },
+  { id: 'reviews',   label: 'Reviews' },
 ]
 
-export default function ProductDetailClient({ product }: { product: Product }) {
+export default function ProductDetailClient({
+  product, reviews, reviewStats,
+}: {
+  product: Product
+  reviews: Review[]
+  reviewStats: ReviewStats
+}) {
   const [tab, setTab] = useState<Tab>('overview')
 
   return (
@@ -43,6 +52,23 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               <span className="text-xs font-mono text-white/20">{product.sku}</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-bold text-white leading-tight tracking-tight">{product.name}</h1>
+
+            {/* Rating summary */}
+            {reviewStats.total > 0 && (
+              <button onClick={() => setTab('reviews')} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                <div className="flex gap-0.5">
+                  {[1,2,3,4,5].map((s) => (
+                    <svg key={s} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                        className={s <= Math.round(reviewStats.average) ? 'fill-amber-400 stroke-amber-400' : 'fill-transparent stroke-white/20'}
+                      />
+                    </svg>
+                  ))}
+                </div>
+                <span className="text-sm text-white/60">{reviewStats.average.toFixed(1)} ({reviewStats.total} review{reviewStats.total !== 1 ? 's' : ''})</span>
+              </button>
+            )}
+
             <p className="text-lg text-white/50 leading-relaxed">{product.tagline}</p>
             <div className="flex items-center gap-4 py-4 border-y border-white/[0.06]">
               <span className="text-3xl font-bold text-white">{formatPrice(product.price, product.currency)}</span>
@@ -76,16 +102,23 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         </div>
       </div>
 
+      {/* Tab bar */}
       <div className="border-t border-white/[0.06] px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto flex gap-1 overflow-x-auto scrollbar-hide pt-2">
           {TABS.map((t) => (
-            <button key={t.id} onClick={() => setTab(t.id)} className={`flex-shrink-0 px-5 py-3 text-sm font-medium rounded-t-lg transition-all duration-150 border-b-2 ${tab === t.id ? 'text-white border-cyan-400 bg-white/[0.03]' : 'text-white/40 hover:text-white/70 border-transparent'}`}>
+            <button key={t.id} onClick={() => setTab(t.id)} className={`flex-shrink-0 px-5 py-3 text-sm font-medium rounded-t-lg transition-all duration-150 border-b-2 ${
+              tab === t.id ? 'text-white border-cyan-400 bg-white/[0.03]' : 'text-white/40 hover:text-white/70 border-transparent'
+            }`}>
               {t.label}
+              {t.id === 'reviews' && reviewStats.total > 0 && (
+                <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full bg-white/[0.06] text-white/30">{reviewStats.total}</span>
+              )}
             </button>
           ))}
         </div>
       </div>
 
+      {/* Tab content */}
       <div className="px-4 sm:px-6 lg:px-8 py-12 border-t border-white/[0.06]">
         <div className="max-w-3xl mx-auto">
           {tab === 'overview'  && <TabOverview  product={product} />}
@@ -93,6 +126,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           {tab === 'setup'     && <TabSetup     product={product} />}
           {tab === 'downloads' && <TabDownloads product={product} />}
           {tab === 'faq'       && <TabFAQ       product={product} />}
+          {tab === 'reviews'   && <ProductReviews productSlug={product.slug} initialReviews={reviews} stats={reviewStats}/>}
         </div>
       </div>
     </div>
