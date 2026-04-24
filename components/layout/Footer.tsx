@@ -13,6 +13,7 @@ const LINKS = {
     { label: 'Documentation',  href: '/docs' },
     { label: 'Tutorials',      href: '/learn' },
     { label: 'API reference',  href: '/docs' },
+    { label: 'Firmware',       href: '/firmware' },
     { label: 'Search',         href: '/search' },
   ],
   Support: [
@@ -21,6 +22,7 @@ const LINKS = {
     { label: 'Warranty',       href: '/support/warranty' },
     { label: 'Shipping',       href: '/support/shipping' },
     { label: 'Returns',        href: '/support/returns' },
+    { label: 'Register device', href: '/register' },
   ],
   Company: [
     { label: 'About Atoms',    href: '/about' },

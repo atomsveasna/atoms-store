@@ -170,6 +170,10 @@ export default function AccountPage() {
                   <span className="text-sm text-white/60 group-hover:text-white transition-colors">Contact support</span>
                   <span className="text-white/20 group-hover:text-white/50">→</span>
                 </Link>
+                <Link href="/register" className="flex items-center justify-between p-3 rounded-xl hover:bg-white/[0.04] transition-colors group">
+                  <span className="text-sm text-white/60 group-hover:text-white transition-colors">Register a device</span>
+                  <span className="text-white/20 group-hover:text-white/50">→</span>
+                </Link>
                 <Link href="/support/warranty" className="flex items-center justify-between p-3 rounded-xl hover:bg-white/[0.04] transition-colors group">
                   <span className="text-sm text-white/60 group-hover:text-white transition-colors">Warranty policy</span>
                   <span className="text-white/20 group-hover:text-white/50">→</span>
