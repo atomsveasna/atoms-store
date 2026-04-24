@@ -23,7 +23,7 @@ function OrderRow({ order }: { order: Order }) {
     const res = await fetch('/api/admin/orders', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: order.id, status: newStatus }),
+      body: JSON.stringify({ id: order.id, status: newStatus, order }),
     })
     if (res.ok) setStatus(newStatus)
     setLoading(false)

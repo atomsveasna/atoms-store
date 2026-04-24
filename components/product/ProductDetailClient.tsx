@@ -7,6 +7,7 @@ import ProductGallery from '@/components/product/ProductGallery'
 import AddToCart from '@/components/product/AddToCart'
 import { TabOverview, TabSpecs, TabSetup, TabDownloads, TabFAQ } from '@/components/product/ProductTabs'
 import ProductReviews from '@/components/product/ProductReviews'
+import { CompareButton } from '@/app/(shop)/compare/page'
 import type { Product } from '@/types'
 import type { Review, ReviewStats } from '@/lib/data/reviews'
 
@@ -90,6 +91,7 @@ export default function ProductDetailClient({
               ))}
             </div>
             <AddToCart product={product} />
+            <CompareButton slug={product.slug} />
             {product.docSlug && (
               <Link href={`/docs/${product.docSlug}`} className="flex items-center gap-2 text-sm text-white/30 hover:text-cyan-400 transition-colors">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

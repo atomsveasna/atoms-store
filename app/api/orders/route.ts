@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createOrder } from '@/lib/data/orders'
+import { sendOrderConfirmation } from '@/lib/email'
 
 export async function POST(req: NextRequest) {
   const data = await req.json()
 
   // Save to Supabase
-  const order = await createOrder({
+  await createOrder({
     orderNumber:     data.orderNumber,
     customerName:    data.customerName,
     customerEmail:   data.customerEmail,
@@ -21,32 +22,33 @@ export async function POST(req: NextRequest) {
     items:           data.items,
   })
 
-  // Send Telegram notification
+  // Send order confirmation email
+  if (data.customerEmail) {
+    await sendOrderConfirmation({
+      orderNumber:     data.orderNumber,
+      customerName:    data.customerName,
+      customerEmail:   data.customerEmail,
+      items:           data.items,
+      total:           data.total,
+      currency:        data.currency ?? 'USD',
+      shippingAddress: data.shippingAddress,
+    })
+  }
+
+  // Telegram notification
   const botToken = process.env.TELEGRAM_BOT_TOKEN
   const chatId   = process.env.TELEGRAM_CHAT_ID
-
   if (botToken && chatId) {
     const lines = [
       `🛒 *New Order — ${data.orderNumber}*`,
       ``,
-      `👤 *Customer*`,
-      `Name: ${data.customerName}`,
-      `Phone: ${data.customerPhone}`,
-      data.customerEmail ? `Email: ${data.customerEmail}` : null,
+      `👤 ${data.customerName} · ${data.customerPhone}`,
+      data.customerEmail ? `📧 ${data.customerEmail}` : null,
       ``,
-      `📦 *Items*`,
-      ...data.items.map((i: { quantity: number; productName: string; unitPrice: number }) =>
-        `• ${i.quantity}× ${i.productName} — $${i.unitPrice}`
-      ),
+      `📦 ${data.items.map((i: { quantity: number; productName: string }) => `${i.quantity}× ${i.productName}`).join(', ')}`,
+      `💰 $${data.total}`,
       ``,
-      `💰 *Total: $${data.total}*`,
-      `Payment: ABA Transfer`,
-      ``,
-      `📍 *Delivery*`,
-      data.shippingAddress.addressLine1,
-      data.shippingAddress.addressLine2 ?? null,
-      data.shippingAddress.city,
-      data.shippingAddress.notes ? `Notes: ${data.shippingAddress.notes}` : null,
+      `📍 ${data.shippingAddress.addressLine1}, ${data.shippingAddress.city}`,
     ].filter(Boolean).join('\n')
 
     await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
