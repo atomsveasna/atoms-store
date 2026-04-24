@@ -20,16 +20,20 @@ function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      className="p-2 rounded-md transition-all"
-      style={{ color: 'var(--text-secondary)' }}
       aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+      style={{ color: 'var(--text-secondary)' }}
+      className="p-2 rounded-md hover:opacity-80 transition-opacity"
     >
       {theme === 'dark' ? (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
         </svg>
       ) : (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
         </svg>
       )}
@@ -39,26 +43,36 @@ function ThemeToggle() {
 
 export default function Header() {
   const [open, setOpen] = useState(false)
-  const { user }  = useAuth()
-  const { cart }  = useCart()
+  const { user } = useAuth()
+  const { cart } = useCart()
 
   return (
-    <header style={{ backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border)' }} className="sticky top-0 z-50 backdrop-blur-md">
+    <header
+      className="sticky top-0 z-50 backdrop-blur-md"
+      style={{ background: 'var(--nav-bg)', borderBottom: '1px solid var(--border)' }}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ backgroundColor: 'var(--accent)' }}>
-              <span className="font-bold text-xs" style={{ color: '#080d1a' }}>A</span>
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: 'var(--accent)' }}>
+              <span className="font-bold text-xs font-display" style={{ color: '#080d1a' }}>A</span>
             </div>
-            <span className="font-semibold text-[15px] tracking-tight" style={{ color: 'var(--text-primary)' }}>Atoms</span>
+            <span className="font-display font-semibold text-[15px] tracking-tight" style={{ color: 'var(--text-primary)' }}>
+              Atoms
+            </span>
           </Link>
 
           {/* Desktop nav */}
           <nav className="hidden md:flex items-center gap-1">
             {NAV.map((item) => (
-              <Link key={item.href} href={item.href} className="px-3.5 py-2 text-sm rounded-md transition-all duration-150" style={{ color: 'var(--text-secondary)' }}>
+              <Link
+                key={item.href}
+                href={item.href}
+                className="px-3.5 py-2 text-sm rounded-md transition-all duration-150 hover:opacity-100"
+                style={{ color: 'var(--text-secondary)' }}
+              >
                 {item.label}
               </Link>
             ))}
@@ -88,14 +102,18 @@ export default function Header() {
                 <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/>
               </svg>
               {cart.itemCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 text-[10px] font-bold rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--accent)', color: '#080d1a' }}>
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 text-[10px] font-bold rounded-full flex items-center justify-center" style={{ background: 'var(--accent)', color: '#080d1a' }}>
                   {cart.itemCount > 9 ? '9+' : cart.itemCount}
                 </span>
               )}
             </Link>
 
             {/* Shop CTA */}
-            <Link href="/shop" className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-semibold rounded-lg transition-colors ml-1" style={{ backgroundColor: 'var(--accent)', color: '#080d1a' }}>
+            <Link
+              href="/shop"
+              className="hidden sm:inline-flex items-center px-4 py-2 text-sm font-semibold rounded-lg transition-colors ml-1"
+              style={{ background: 'var(--accent)', color: 'var(--accent-text)' }}
+            >
               Shop now
             </Link>
 
@@ -113,17 +131,32 @@ export default function Header() {
 
         {/* Mobile menu */}
         {open && (
-          <div style={{ borderTop: '1px solid var(--border)' }} className="md:hidden py-3">
+          <div className="md:hidden py-3" style={{ borderTop: '1px solid var(--border)' }}>
             {NAV.map((item) => (
-              <Link key={item.href} href={item.href} onClick={() => setOpen(false)} className="block px-3 py-2.5 text-sm rounded-md" style={{ color: 'var(--text-secondary)' }}>
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className="block px-3 py-2.5 text-sm rounded-md"
+                style={{ color: 'var(--text-secondary)' }}
+              >
                 {item.label}
               </Link>
             ))}
-            <Link href={user ? '/account' : '/auth/login'} onClick={() => setOpen(false)} className="block px-3 py-2.5 text-sm rounded-md" style={{ color: 'var(--text-secondary)' }}>
+            <Link
+              href={user ? '/account' : '/auth/login'}
+              onClick={() => setOpen(false)}
+              className="block px-3 py-2.5 text-sm rounded-md"
+              style={{ color: 'var(--text-secondary)' }}
+            >
               {user ? 'My account' : 'Sign in'}
             </Link>
             <div className="pt-3 mt-3" style={{ borderTop: '1px solid var(--border)' }}>
-              <Link href="/shop" className="block text-center px-4 py-2.5 text-sm font-semibold rounded-lg" style={{ backgroundColor: 'var(--accent)', color: '#080d1a' }}>
+              <Link
+                href="/shop"
+                className="block text-center px-4 py-2.5 text-sm font-semibold rounded-lg"
+                style={{ background: 'var(--accent)', color: 'var(--accent-text)' }}
+              >
                 Shop now
               </Link>
             </div>
