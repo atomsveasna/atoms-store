@@ -1,20 +1,36 @@
 'use client'
 
-import { useState } from 'react'
-import type { Product } from '@/types'
+import { useState, useEffect } from 'react'
+import type { Product, ProductImage } from '@/types'
 
 export default function ProductGallery({ product }: { product: Product }) {
+  const [images, setImages] = useState<ProductImage[]>(product.images ?? [])
   const [active, setActive] = useState(0)
+
+  // Fetch images from Supabase
+  useEffect(() => {
+    fetch(`/api/products/images?slug=${product.slug}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.images?.length > 0) {
+          setImages(data.images.map((img: { src: string; alt: string; type: string }) => ({
+            src: img.src, alt: img.alt, type: img.type,
+          })))
+        }
+      })
+      .catch(() => {})
+  }, [product.slug])
 
   return (
     <div className="space-y-3">
+      {/* Main image */}
       <div className="aspect-square rounded-2xl bg-white/[0.03] border border-white/[0.07] flex items-center justify-center overflow-hidden relative">
-        {product.images[active] ? (
+        {images[active] ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={product.images[active].src}
-            alt={product.images[active].alt}
-            className="w-full h-full object-contain p-8"
+            src={images[active].src}
+            alt={images[active].alt}
+            className="w-full h-full object-contain p-4"
           />
         ) : (
           <div className="flex flex-col items-center gap-3 text-white/20">
@@ -30,19 +46,22 @@ export default function ProductGallery({ product }: { product: Product }) {
           </span>
         )}
       </div>
-      {product.images.length > 1 && (
-        <div className="flex gap-2">
-          {product.images.map((img, i) => (
+
+      {/* Thumbnails */}
+      {images.length > 1 && (
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+          {images.map((img, i) => (
             <button
               key={i}
               onClick={() => setActive(i)}
-              className={`w-16 h-16 rounded-xl border flex items-center justify-center transition-all ${
+              className={`flex-shrink-0 w-16 h-16 rounded-xl border overflow-hidden flex items-center justify-center transition-all ${
                 i === active
                   ? 'border-cyan-400/50 bg-cyan-400/10'
                   : 'border-white/[0.07] bg-white/[0.02] hover:border-white/20'
               }`}
             >
-              <span className="text-[10px] text-white/30">{img.type}</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={img.src} alt={img.alt} className="w-full h-full object-cover rounded-xl"/>
             </button>
           ))}
         </div>

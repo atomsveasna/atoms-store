@@ -42,6 +42,17 @@ export default function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {/* Search */}
+            <Link
+              href="/search"
+              className="hidden sm:flex p-2 text-white/50 hover:text-white hover:bg-white/[0.06] rounded-md transition-all"
+              aria-label="Search"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+            </Link>
+
             {/* Account */}
             <Link
               href={user ? '/account' : '/auth/login'}
