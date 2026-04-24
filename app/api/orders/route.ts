@@ -1,49 +1,60 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createOrder } from '@/lib/data/orders'
 
 export async function POST(req: NextRequest) {
-  const order = await req.json()
+  const data = await req.json()
 
-  // Send Telegram notification if configured
+  // Save to Supabase
+  const order = await createOrder({
+    orderNumber:     data.orderNumber,
+    customerName:    data.customerName,
+    customerEmail:   data.customerEmail,
+    customerPhone:   data.customerPhone,
+    shippingAddress: data.shippingAddress,
+    subtotal:        data.subtotal,
+    shippingFee:     data.shippingFee ?? 0,
+    total:           data.total,
+    currency:        data.currency ?? 'USD',
+    paymentMethod:   data.paymentMethod,
+    status:          data.status ?? 'payment_submitted',
+    notes:           data.notes,
+    items:           data.items,
+  })
+
+  // Send Telegram notification
   const botToken = process.env.TELEGRAM_BOT_TOKEN
   const chatId   = process.env.TELEGRAM_CHAT_ID
 
   if (botToken && chatId) {
     const lines = [
-      `🛒 *New Order — ${order.orderNumber}*`,
+      `🛒 *New Order — ${data.orderNumber}*`,
       ``,
       `👤 *Customer*`,
-      `Name: ${order.customerName}`,
-      `Phone: ${order.customerPhone}`,
-      order.customerEmail ? `Email: ${order.customerEmail}` : null,
+      `Name: ${data.customerName}`,
+      `Phone: ${data.customerPhone}`,
+      data.customerEmail ? `Email: ${data.customerEmail}` : null,
       ``,
       `📦 *Items*`,
-      ...order.items.map((i: { quantity: number; productName: string; unitPrice: number }) =>
+      ...data.items.map((i: { quantity: number; productName: string; unitPrice: number }) =>
         `• ${i.quantity}× ${i.productName} — $${i.unitPrice}`
       ),
       ``,
-      `💰 *Total: $${order.total}*`,
+      `💰 *Total: $${data.total}*`,
       `Payment: ABA Transfer`,
       ``,
       `📍 *Delivery*`,
-      `${order.shippingAddress.addressLine1}`,
-      order.shippingAddress.addressLine2 ?? null,
-      `${order.shippingAddress.city}`,
-      order.shippingAddress.notes ? `Notes: ${order.shippingAddress.notes}` : null,
+      data.shippingAddress.addressLine1,
+      data.shippingAddress.addressLine2 ?? null,
+      data.shippingAddress.city,
+      data.shippingAddress.notes ? `Notes: ${data.shippingAddress.notes}` : null,
     ].filter(Boolean).join('\n')
 
     await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: lines,
-        parse_mode: 'Markdown',
-      }),
-    }).catch(() => {}) // don't fail order if Telegram is down
+      body: JSON.stringify({ chat_id: chatId, text: lines, parse_mode: 'Markdown' }),
+    }).catch(() => {})
   }
 
-  // TODO Phase 1: save to database
-  // await prisma.order.create({ data: order })
-
-  return NextResponse.json({ success: true, orderNumber: order.orderNumber })
+  return NextResponse.json({ success: true, orderNumber: data.orderNumber })
 }

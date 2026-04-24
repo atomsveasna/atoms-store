@@ -1,21 +1,32 @@
 import Link from 'next/link'
 import { getAllProducts } from '@/lib/data/products'
 import { getAllDocs } from '@/lib/data/docs'
+import { getAllOrders } from '@/lib/data/orders'
 import { formatPrice, getStatusLabel } from '@/lib/utils'
 import AddProductForm from '@/components/admin/AddProductForm'
 import AddDocForm from '@/components/admin/AddDocForm'
 import ProductImageUpload from '@/components/admin/ProductImageUpload'
+import OrdersManager from '@/components/admin/OrdersManager'
 
 export default async function AdminPage() {
-  const products = await getAllProducts()
-  const docs     = await getAllDocs()
-  const slugs    = products.map((p) => p.slug)
+  const [products, docs, orders] = await Promise.all([
+    getAllProducts(),
+    getAllDocs(),
+    getAllOrders(),
+  ])
+  const slugs = products.map((p) => p.slug)
 
   return (
     <div className="space-y-12">
       <div>
         <h1 className="text-2xl font-bold text-white mb-1">Admin</h1>
-        <p className="text-sm text-white/40">Manage products, images, and documentation.</p>
+        <p className="text-sm text-white/40">Manage orders, products, images, and documentation.</p>
+      </div>
+
+      {/* Orders */}
+      <div>
+        <h2 className="text-lg font-bold text-white mb-6">Orders</h2>
+        <OrdersManager orders={orders} />
       </div>
 
       {/* Products list */}
@@ -99,7 +110,7 @@ export default async function AdminPage() {
       <div>
         <h2 className="text-lg font-bold text-white mb-6">Add new doc</h2>
         <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6">
-          <AddDocForm productSlugs={slugs} />
+          <AddDocForm productSlugs={slugs.length > 0 ? slugs : ['atoms-smart-switch-1g']} />
         </div>
       </div>
     </div>
