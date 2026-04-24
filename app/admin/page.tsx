@@ -4,17 +4,18 @@ import { getAllDocs } from '@/lib/data/docs'
 import { formatPrice, getStatusLabel } from '@/lib/utils'
 import AddProductForm from '@/components/admin/AddProductForm'
 import AddDocForm from '@/components/admin/AddDocForm'
+import ProductImageUpload from '@/components/admin/ProductImageUpload'
 
 export default async function AdminPage() {
   const products = await getAllProducts()
   const docs     = await getAllDocs()
+  const slugs    = products.map((p) => p.slug)
 
   return (
     <div className="space-y-12">
-
       <div>
         <h1 className="text-2xl font-bold text-white mb-1">Admin</h1>
-        <p className="text-sm text-white/40">Manage products and documentation.</p>
+        <p className="text-sm text-white/40">Manage products, images, and documentation.</p>
       </div>
 
       {/* Products list */}
@@ -52,6 +53,17 @@ export default async function AdminPage() {
         </div>
       </div>
 
+      {/* Image upload */}
+      {slugs.length > 0 && (
+        <div>
+          <h2 className="text-lg font-bold text-white mb-2">Upload product images</h2>
+          <p className="text-sm text-white/40 mb-6">Images are stored in Supabase and appear on the product page immediately.</p>
+          <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6">
+            <ProductImageUpload productSlugs={slugs} />
+          </div>
+        </div>
+      )}
+
       {/* Add product */}
       <div>
         <h2 className="text-lg font-bold text-white mb-6">Add new product</h2>
@@ -79,7 +91,7 @@ export default async function AdminPage() {
               </div>
             </div>
           ))}
-          {docs.length === 0 && <div className="px-6 py-8 text-center text-sm text-white/30">No docs yet — add your first below</div>}
+          {docs.length === 0 && <div className="px-6 py-8 text-center text-sm text-white/30">No docs yet</div>}
         </div>
       </div>
 
@@ -87,7 +99,7 @@ export default async function AdminPage() {
       <div>
         <h2 className="text-lg font-bold text-white mb-6">Add new doc</h2>
         <div className="rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6">
-          <AddDocForm productSlugs={products.map((p) => p.slug)} />
+          <AddDocForm productSlugs={slugs} />
         </div>
       </div>
     </div>
