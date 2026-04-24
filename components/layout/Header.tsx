@@ -7,6 +7,7 @@ import { useCart } from '@/lib/cart'
 
 const NAV = [
   { label: 'Shop',    href: '/shop' },
+  { label: 'Bundles', href: '/bundles' },
   { label: 'Docs',    href: '/docs' },
   { label: 'Learn',   href: '/learn' },
   { label: 'Support', href: '/support' },

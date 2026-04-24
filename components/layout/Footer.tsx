@@ -8,6 +8,7 @@ const LINKS = {
     { label: 'Smart sockets',  href: '/shop?category=sockets' },
     { label: 'DIY kits',       href: '/shop?category=bundles' },
     { label: 'Accessories',    href: '/shop?category=accessories' },
+    { label: 'Bundles & kits', href: '/bundles' },
   ],
   Learn: [
     { label: 'Documentation',  href: '/docs' },

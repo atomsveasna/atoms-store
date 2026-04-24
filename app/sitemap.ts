@@ -1,5 +1,6 @@
 import { getAllProducts } from '@/lib/data/products'
 import { getAllPosts } from '@/lib/data/blog'
+import { getAllBundles } from '@/lib/data/bundles'
 
 export default async function sitemap() {
   const base     = 'https://atomsiot.com'
