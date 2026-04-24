@@ -16,9 +16,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <span className="text-white/20 text-sm">/</span>
           <span className="text-sm text-white/50">Admin</span>
         </div>
-        <a href="/" className="text-xs text-white/30 hover:text-white transition-colors">
-          ← Back to site
-        </a>
+        <div className="flex items-center gap-4">
+          <a href="/admin" className="text-xs text-white/40 hover:text-white transition-colors">Products & Orders</a>
+          <a href="/admin/analytics" className="text-xs text-white/40 hover:text-white transition-colors">Analytics</a>
+          <a href="/" className="text-xs text-white/30 hover:text-white transition-colors">← Back to site</a>
+        </div>
       </div>
       <main className="max-w-4xl mx-auto px-6 py-10">
         {children}

@@ -27,7 +27,8 @@ const LINKS = {
   Company: [
     { label: 'About Atoms',    href: '/about' },
     { label: 'For installers', href: '/contact' },
-    { label: 'For developers', href: '/docs' },
+    { label: 'For developers',  href: '/docs' },
+    { label: 'For installers', href: '/installers' },
   ],
 }
 
