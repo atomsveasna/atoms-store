@@ -13,16 +13,18 @@
   },
   "dependencies": {
     "@prisma/client": "^5.10.0",
+    "@supabase/supabase-js": "^2.104.1",
     "@types/mdx": "^2.0.11",
     "clsx": "^2.1.0",
+    "gray-matter": "^4.0.3",
+    "jose": "^6.2.3",
+    "lucide-react": "^0.344.0",
     "next": "14.1.0",
     "next-mdx-remote": "^4.4.1",
     "react": "^18",
     "react-dom": "^18",
-    "tailwind-merge": "^2.2.1",
-    "gray-matter": "^4.0.3",
-    "lucide-react": "^0.344.0",
     "resend": "^3.2.0",
+    "tailwind-merge": "^2.2.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {

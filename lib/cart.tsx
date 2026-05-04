@@ -27,14 +27,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   // Load from localStorage on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('atoms-cart')
+      const saved = typeof window !== 'undefined' ? localStorage.getItem('atoms-cart') : null
       if (saved) setItems(JSON.parse(saved))
     } catch {}
   }, [])
 
   // Save to localStorage on change
   useEffect(() => {
-    localStorage.setItem('atoms-cart', JSON.stringify(items))
+    if (typeof window !== 'undefined') localStorage.setItem('atoms-cart', JSON.stringify(items))
   }, [items])
 
   function addItem(item: Omit<CartItem, 'quantity'>) {

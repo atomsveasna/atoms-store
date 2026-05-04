@@ -275,7 +275,9 @@ export default function CheckoutPage() {
   const [orderNumber] = useState(() => generateOrderNumber())
 
   if (cart.items.length === 0) {
-    router.replace('/shop')
+    if (typeof window !== 'undefined') {
+      window.location.href = '/shop'
+    }
     return null
   }
 

@@ -1,7 +1,6 @@
 /**
  * lib/data/products.ts
  * Phase 0: seed data | Phase 1: Supabase (current)
- * Falls back to seed data if Supabase is not configured.
  */
 
 import type { Product, ProductCategory } from '@/types'
@@ -12,6 +11,7 @@ const USE_SUPABASE = !!(
 )
 
 function mapRow(row: Record<string, unknown>): Product {
+  const imgRows = (row.product_images as Record<string, unknown>[] | undefined) ?? []
   return {
     id:                 row.id as string,
     slug:               row.slug as string,
@@ -36,7 +36,11 @@ function mapRow(row: Record<string, unknown>): Product {
     revisionHistory:    row.revision_history as Product['revisionHistory'],
     isNew:              row.is_new as boolean,
     isFeatured:         row.is_featured as boolean,
-    images:             (row.images as Product['images']) ?? [],
+    images:             imgRows.map((img) => ({
+      src:  img.src as string,
+      alt:  img.alt as string,
+      type: img.type as 'photo' | 'render' | 'diagram',
+    })),
     createdAt:          row.created_at as string,
     updatedAt:          row.updated_at as string,
   }
@@ -60,10 +64,12 @@ async function getSeedProducts(): Promise<Product[]> {
   return PRODUCTS
 }
 
+const WITH_IMAGES = 'products?select=*,product_images(src,alt,type,sort_order)&order=created_at.desc'
+
 export async function getAllProducts(): Promise<Product[]> {
   if (!USE_SUPABASE) return getSeedProducts()
   try {
-    const rows = await supabaseFetch('products?select=*&order=created_at.desc')
+    const rows = await supabaseFetch(WITH_IMAGES)
     return rows.map(mapRow)
   } catch { return getSeedProducts() }
 }
@@ -74,7 +80,7 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     return p.find((p) => p.slug === slug) ?? null
   }
   try {
-    const rows = await supabaseFetch(`products?select=*&slug=eq.${slug}&limit=1`)
+    const rows = await supabaseFetch(`products?select=*,product_images(src,alt,type,sort_order)&slug=eq.${slug}&limit=1`)
     return rows.length > 0 ? mapRow(rows[0]) : null
   } catch {
     const p = await getSeedProducts()
@@ -88,7 +94,7 @@ export async function getFeaturedProducts(): Promise<Product[]> {
     return p.filter((p) => p.isFeatured)
   }
   try {
-    const rows = await supabaseFetch('products?select=*&is_featured=eq.true')
+    const rows = await supabaseFetch('products?select=*,product_images(src,alt,type,sort_order)&is_featured=eq.true')
     return rows.map(mapRow)
   } catch {
     const p = await getSeedProducts()
@@ -102,7 +108,7 @@ export async function getProductsByCategory(category: ProductCategory): Promise<
     return p.filter((p) => p.category === category)
   }
   try {
-    const rows = await supabaseFetch(`products?select=*&category=eq.${category}`)
+    const rows = await supabaseFetch(`products?select=*,product_images(src,alt,type,sort_order)&category=eq.${category}`)
     return rows.map(mapRow)
   } catch {
     const p = await getSeedProducts()

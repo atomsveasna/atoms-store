@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export async function POST(req: NextRequest) {
+export async function PATCH(req: NextRequest, { params }: { params: { slug: string } }) {
   const data = await req.json()
-
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY
 
@@ -19,12 +18,10 @@ export async function POST(req: NextRequest) {
     category:             data.category,
     status:               data.status,
     price:                parseFloat(data.price),
-    currency:             'USD',
     sku:                  data.sku,
     is_new:               data.isNew === true,
     is_featured:          data.isFeatured === true,
     firmware_version:     data.firmwareVersion || null,
-    doc_slug:             data.slug,
     features:             (data.features || '').split('\n').map((f: string) => f.trim()).filter(Boolean),
     specs:                (data.specs || '').split('\n').map((line: string) => {
       const [label, ...rest] = line.split(':')
@@ -38,45 +35,21 @@ export async function POST(req: NextRequest) {
           return { question: q?.trim(), answer: a.join('\n').trim() }
         }).filter((f: { question: string; answer: string }) => f.question && f.answer)
       : [],
-    downloads:            [],
-    related_slugs:        [],
-    revision_history:     null,
+    updated_at: new Date().toISOString(),
   }
 
-  const res = await fetch(`${supabaseUrl}/rest/v1/products`, {
-    method: 'POST',
+  const res = await fetch(`${supabaseUrl}/rest/v1/products?slug=eq.${params.slug}`, {
+    method: 'PATCH',
     headers: {
-      apikey:          serviceKey,
-      Authorization:   `Bearer ${serviceKey}`,
-      'Content-Type':  'application/json',
-      Prefer:          'return=representation',
+      apikey:         serviceKey,
+      Authorization:  `Bearer ${serviceKey}`,
+      'Content-Type': 'application/json',
+      Prefer:         'return=representation',
     },
     body: JSON.stringify(product),
   })
 
   const result = await res.json()
-  if (!res.ok) {
-    return NextResponse.json({ error: result.message ?? 'Failed to save' }, { status: 400 })
-  }
-
-  return NextResponse.json({ success: true, slug: data.slug })
-}
-
-export async function DELETE(req: NextRequest) {
-  const { slug } = await req.json()
-  if (!slug) return NextResponse.json({ error: 'Missing slug' }, { status: 400 })
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const serviceKey  = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-  const res = await fetch(`${supabaseUrl}/rest/v1/products?slug=eq.${slug}`, {
-    method: 'DELETE',
-    headers: {
-      apikey:        serviceKey!,
-      Authorization: `Bearer ${serviceKey}`,
-    },
-  })
-
-  if (!res.ok) return NextResponse.json({ error: 'Failed to delete' }, { status: 400 })
+  if (!res.ok) return NextResponse.json({ error: result.message ?? 'Failed to update' }, { status: 400 })
   return NextResponse.json({ success: true })
 }

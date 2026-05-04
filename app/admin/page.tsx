@@ -9,6 +9,8 @@ import AddDocForm from '@/components/admin/AddDocForm'
 import AddPostForm from '@/components/admin/AddPostForm'
 import ProductImageUpload from '@/components/admin/ProductImageUpload'
 import OrdersManager from '@/components/admin/OrdersManager'
+import DeleteProductButton from '@/components/admin/DeleteProductButton'
+import EditProductButton from '@/components/admin/EditProductButton'
 
 export default async function AdminPage() {
   const [products, docs, orders, posts] = await Promise.all([
@@ -53,6 +55,8 @@ export default async function AdminPage() {
                   {getStatusLabel(p.status)}
                 </span>
                 <Link href={`/products/${p.slug}`} target="_blank" className="text-xs text-white/20 hover:text-cyan-400">View →</Link>
+                <EditProductButton product={p} />
+                <DeleteProductButton slug={p.slug} />
               </div>
             </div>
           ))}

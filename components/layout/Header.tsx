@@ -55,13 +55,8 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: 'var(--accent)' }}>
-              <span className="font-bold text-xs font-display" style={{ color: '#080d1a' }}>A</span>
-            </div>
-            <span className="font-display font-semibold text-[15px] tracking-tight" style={{ color: 'var(--text-primary)' }}>
-              Atoms
-            </span>
+          <Link href="/" className="flex items-center group">
+            <img src="/logo-icon.svg" alt="Atoms" className="h-9 w-auto" />
           </Link>
 
           {/* Desktop nav */}

@@ -84,6 +84,6 @@ export async function getDocsByProduct(productSlug: string): Promise<Doc[]> {
 
 export async function getDocCategories(productSlug: string): Promise<string[]> {
   const docs = await getDocsByProduct(productSlug)
-  const cats = [...new Set(docs.map((d) => d.category))]
+  const cats = Array.from(new Set(docs.map((d) => d.category)))
   return cats
 }

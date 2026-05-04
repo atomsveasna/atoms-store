@@ -24,7 +24,7 @@ export default function ProductGallery({ product }: { product: Product }) {
   return (
     <div className="space-y-3">
       {/* Main image */}
-      <div className="aspect-square rounded-2xl bg-white/[0.03] border border-white/[0.07] flex items-center justify-center overflow-hidden relative">
+      <div className="aspect-[3/4] rounded-2xl bg-white/[0.03] border border-white/[0.07] flex items-center justify-center overflow-hidden relative">
         {images[active] ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
